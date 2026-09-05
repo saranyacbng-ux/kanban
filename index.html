@@ -8,37 +8,47 @@
   <style>
     :root {
       color-scheme: light;
-      --bg: #f4f4f2;
-      --surface: #ffffff;
-      --surface-soft: #fafafa;
-      --text: #171717;
-      --muted: #686868;
-      --line: #dededb;
-      --line-strong: #b8b8b3;
-      --ornament-line: rgba(23, 23, 23, 0.075);
-      --primary: #111111;
+      --bg: #fff7fb;
+      --surface: #fffefe;
+      --surface-soft: #fff8fc;
+      --text: #3a2937;
+      --muted: #765f70;
+      --line: #ecdce7;
+      --line-strong: #dcbfd3;
+      --primary: #e76f9a;
       --primary-text: #ffffff;
-      --danger: #9d2929;
-      --shadow: 0 14px 36px rgba(0, 0, 0, 0.06);
-      --card-shadow: 0 5px 16px rgba(0, 0, 0, 0.055);
-      --radius: 18px;
+      --danger: #b93f57;
+      --accent-pink: #f3a8c3;
+      --accent-yellow: #f2c96d;
+      --accent-blue: #86c9df;
+      --accent-purple: #bca5e9;
+      --bubble-pink: rgba(242, 151, 185, 0.16);
+      --bubble-blue: rgba(134, 201, 223, 0.14);
+      --shadow: 0 16px 38px rgba(112, 65, 95, 0.09);
+      --card-shadow: 0 7px 18px rgba(112, 65, 95, 0.08);
+      --radius: 24px;
     }
 
     :root[data-theme="dark"] {
       color-scheme: dark;
-      --bg: #111111;
-      --surface: #1b1b1b;
-      --surface-soft: #202020;
-      --text: #f2f2ef;
-      --muted: #aaaaa4;
-      --line: #353535;
-      --line-strong: #525252;
-      --ornament-line: rgba(242, 242, 239, 0.07);
-      --primary: #f1f1ed;
-      --primary-text: #151515;
-      --danger: #ff8b8b;
-      --shadow: 0 16px 42px rgba(0, 0, 0, 0.28);
-      --card-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+      --bg: #211822;
+      --surface: #2c202d;
+      --surface-soft: #332536;
+      --text: #fff6fb;
+      --muted: #d3bccc;
+      --line: #4c384b;
+      --line-strong: #72546d;
+      --primary: #ff96b9;
+      --primary-text: #321f2c;
+      --danger: #ff9aac;
+      --accent-pink: #ff96b9;
+      --accent-yellow: #f1cc79;
+      --accent-blue: #84cbe1;
+      --accent-purple: #c5adef;
+      --bubble-pink: rgba(255, 150, 185, 0.09);
+      --bubble-blue: rgba(132, 203, 225, 0.07);
+      --shadow: 0 18px 44px rgba(0, 0, 0, 0.24);
+      --card-shadow: 0 7px 20px rgba(0, 0, 0, 0.18);
     }
 
     * { box-sizing: border-box; }
@@ -50,12 +60,10 @@
       min-height: 100vh;
       margin: 0;
       background-color: var(--bg);
-      background-image: repeating-radial-gradient(
-        ellipse 720px 420px at 92% -7%,
-        transparent 0 38px,
-        var(--ornament-line) 39px 40px,
-        transparent 41px 72px
-      );
+      background-image:
+        radial-gradient(circle at 6% 4%, var(--bubble-pink) 0 92px, transparent 93px),
+        radial-gradient(circle at 93% 7%, var(--bubble-blue) 0 130px, transparent 131px),
+        radial-gradient(circle at 82% 96%, var(--bubble-pink) 0 76px, transparent 77px);
       color: var(--text);
       font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       font-size: 16px;
@@ -97,9 +105,11 @@
       right: 0;
       bottom: 0;
       left: 0;
-      height: 1px;
-      background: linear-gradient(90deg, var(--text) 0 86px, var(--line) 86px 100%);
+      height: 3px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--accent-pink), var(--accent-yellow), var(--accent-blue), var(--accent-purple));
       content: "";
+      opacity: 0.78;
     }
 
     .eyebrow {
@@ -115,10 +125,10 @@
     }
 
     .eyebrow::before {
-      width: 26px;
-      height: 1px;
-      background: currentColor;
-      content: "";
+      color: var(--primary);
+      content: "♡";
+      font-size: 1.2rem;
+      line-height: 1;
     }
 
     h1 {
@@ -127,6 +137,7 @@
       font-weight: 680;
       letter-spacing: -0.045em;
       line-height: 1.08;
+      text-shadow: 0 3px 0 color-mix(in srgb, var(--primary) 12%, transparent);
     }
 
     .header-note {
@@ -141,17 +152,17 @@
       min-height: 48px;
       align-items: center;
       justify-content: center;
-      border: 1px solid var(--line);
+      border: 2px solid color-mix(in srgb, var(--primary) 35%, var(--line));
       border-radius: 999px;
-      background: var(--surface);
+      background: color-mix(in srgb, var(--primary) 10%, var(--surface));
       box-shadow: var(--card-shadow);
       font-size: 1.15rem;
       transition: transform 150ms ease, border-color 150ms ease, background-color 180ms ease;
     }
 
     .theme-toggle:hover {
-      border-color: var(--line-strong);
-      transform: translateY(-1px);
+      border-color: var(--primary);
+      transform: translateY(-2px) rotate(5deg);
     }
 
     .board {
@@ -162,25 +173,34 @@
     }
 
     .column {
+      --column-accent: var(--accent-pink);
       position: relative;
       min-height: 420px;
       padding: 16px;
-      border: 1px solid var(--line);
+      border: 1px solid color-mix(in srgb, var(--column-accent) 38%, var(--line));
+      border-top: 5px solid var(--column-accent);
       border-radius: var(--radius);
-      background: var(--surface-soft);
+      background: color-mix(in srgb, var(--column-accent) 5%, var(--surface-soft));
       box-shadow: var(--shadow);
       transition: border-color 150ms ease, background-color 180ms ease, transform 150ms ease;
     }
 
+    .column:nth-child(2) { --column-accent: var(--accent-yellow); }
+    .column:nth-child(3) { --column-accent: var(--accent-blue); }
+    .column:nth-child(4) { --column-accent: var(--accent-purple); }
+
     .column::before {
       position: absolute;
-      top: -1px;
-      left: 17px;
-      width: 54px;
-      height: 1px;
-      background: var(--text);
+      top: 14px;
+      right: 20px;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--column-accent);
+      box-shadow:
+        -13px 4px 0 color-mix(in srgb, var(--column-accent) 60%, transparent),
+        -26px 0 0 color-mix(in srgb, var(--column-accent) 34%, transparent);
       content: "";
-      opacity: 0.82;
     }
 
     .column.is-over {
@@ -210,10 +230,10 @@
       align-items: center;
       justify-content: center;
       padding: 0 9px;
-      border: 1px solid var(--line);
+      border: 1px solid color-mix(in srgb, var(--column-accent) 45%, var(--line));
       border-radius: 999px;
-      background: var(--surface);
-      color: var(--muted);
+      background: color-mix(in srgb, var(--column-accent) 13%, var(--surface));
+      color: var(--text);
       font-size: 0.82rem;
       font-variant-numeric: tabular-nums;
     }
@@ -235,28 +255,33 @@
     .task-card {
       position: relative;
       padding: 15px;
-      border: 1px solid var(--line);
-      border-radius: 13px;
+      border: 1px solid color-mix(in srgb, var(--column-accent) 25%, var(--line));
+      border-radius: 19px;
       background: var(--surface);
       box-shadow: var(--card-shadow);
-      transition: border-color 150ms ease, opacity 150ms ease, transform 150ms ease, background-color 180ms ease;
+      transition: border-color 150ms ease, box-shadow 150ms ease, opacity 150ms ease, transform 150ms ease, background-color 180ms ease;
     }
 
     .task-card::before {
       position: absolute;
       top: 15px;
       bottom: 15px;
-      left: -1px;
-      width: 1px;
-      background: var(--line-strong);
+      left: -2px;
+      width: 4px;
+      border-radius: 999px;
+      background: var(--column-accent);
       content: "";
-      opacity: 0.7;
+      opacity: 0.75;
     }
 
     .task-card[draggable="true"] { cursor: grab; }
     .task-card[draggable="true"]:active { cursor: grabbing; }
 
-    .task-card:hover { border-color: var(--line-strong); }
+    .task-card:hover {
+      border-color: color-mix(in srgb, var(--column-accent) 65%, var(--line));
+      box-shadow: 0 10px 24px color-mix(in srgb, var(--column-accent) 16%, transparent);
+      transform: translateY(-2px);
+    }
 
     .task-card.is-dragging {
       opacity: 0.45;
@@ -325,25 +350,26 @@
       width: 100%;
       min-height: 46px;
       margin-top: 12px;
-      border: 1px dashed var(--line-strong);
-      border-radius: 11px;
-      background: transparent;
-      color: var(--muted);
+      border: 1px dashed color-mix(in srgb, var(--column-accent) 68%, var(--line-strong));
+      border-radius: 16px;
+      background: color-mix(in srgb, var(--column-accent) 8%, transparent);
+      color: var(--text);
       font-weight: 650;
       transition: background-color 150ms ease, color 150ms ease, border-color 150ms ease;
     }
 
     .add-card-button:hover {
-      border-color: var(--text);
-      background: var(--surface);
+      border-color: var(--column-accent);
+      background: color-mix(in srgb, var(--column-accent) 16%, var(--surface));
       color: var(--text);
+      transform: translateY(-1px);
     }
 
     dialog {
       width: min(520px, calc(100vw - 32px));
       padding: 0;
-      border: 1px solid var(--line);
-      border-radius: 18px;
+      border: 2px solid color-mix(in srgb, var(--primary) 35%, var(--line));
+      border-radius: 26px;
       background: var(--surface);
       color: var(--text);
       box-shadow: 0 24px 80px rgba(0, 0, 0, 0.24);
@@ -420,12 +446,9 @@
 
     @media (max-width: 700px) {
       body {
-        background-image: repeating-radial-gradient(
-          ellipse 420px 260px at 112% -4%,
-          transparent 0 30px,
-          var(--ornament-line) 31px 32px,
-          transparent 33px 57px
-        );
+        background-image:
+          radial-gradient(circle at -8% 2%, var(--bubble-pink) 0 74px, transparent 75px),
+          radial-gradient(circle at 108% 8%, var(--bubble-blue) 0 94px, transparent 95px);
       }
       .app-shell { padding: 22px 14px 34px; }
       .app-header { margin-bottom: 20px; }
@@ -451,12 +474,12 @@
   <main class="app-shell">
     <header class="app-header">
       <div>
-        <p class="eyebrow">ORDER FLOW</p>
+        <p class="eyebrow">SWEET ORDER BOARD</p>
         <h1>กระดานออเดอร์น้ำหวาน</h1>
         <p class="header-note">ลากการ์ดเพื่ออัปเดตสถานะ หรือใช้ปุ่มลูกศรบนมือถือ</p>
       </div>
       <button class="theme-toggle" id="theme-toggle" type="button" aria-label="เปลี่ยนเป็นโหมดมืด" title="สลับโหมดสี">
-        <span aria-hidden="true" id="theme-icon">●</span>
+        <span aria-hidden="true" id="theme-icon">☾</span>
       </button>
     </header>
 
@@ -566,7 +589,7 @@
         if (columnCards.length === 0) {
           const empty = document.createElement('p');
           empty.className = 'empty-state';
-          empty.textContent = 'ยังไม่มีออเดอร์ในขั้นตอนนี้';
+          empty.textContent = 'ยังว่างอยู่ รอออเดอร์หวาน ๆ ♡';
           list.append(empty);
         } else {
           columnCards.forEach(card => list.append(createCard(card, columnIndex)));
@@ -590,7 +613,7 @@
         const addButton = document.createElement('button');
         addButton.className = 'add-card-button';
         addButton.type = 'button';
-        addButton.textContent = '+ เพิ่มออเดอร์';
+        addButton.textContent = '+ เพิ่มออเดอร์ใหม่';
         addButton.addEventListener('click', () => openAddDialog(column.id));
 
         section.append(header, list, addButton);
@@ -744,7 +767,7 @@
       function applyTheme(theme) {
         document.documentElement.dataset.theme = theme;
         const isDark = theme === 'dark';
-        themeIcon.textContent = isDark ? '○' : '●';
+        themeIcon.textContent = isDark ? '☀' : '☾';
         themeToggle.setAttribute('aria-label', isDark ? 'เปลี่ยนเป็นโหมดสว่าง' : 'เปลี่ยนเป็นโหมดมืด');
       }
 
