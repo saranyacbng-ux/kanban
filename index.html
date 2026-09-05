@@ -15,6 +15,7 @@
       --muted: #686868;
       --line: #dededb;
       --line-strong: #b8b8b3;
+      --ornament-line: rgba(23, 23, 23, 0.075);
       --primary: #111111;
       --primary-text: #ffffff;
       --danger: #9d2929;
@@ -32,6 +33,7 @@
       --muted: #aaaaa4;
       --line: #353535;
       --line-strong: #525252;
+      --ornament-line: rgba(242, 242, 239, 0.07);
       --primary: #f1f1ed;
       --primary-text: #151515;
       --danger: #ff8b8b;
@@ -47,7 +49,13 @@
       min-width: 320px;
       min-height: 100vh;
       margin: 0;
-      background: var(--bg);
+      background-color: var(--bg);
+      background-image: repeating-radial-gradient(
+        ellipse 720px 420px at 92% -7%,
+        transparent 0 38px,
+        var(--ornament-line) 39px 40px,
+        transparent 41px 72px
+      );
       color: var(--text);
       font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       font-size: 16px;
@@ -75,20 +83,42 @@
     }
 
     .app-header {
+      position: relative;
       display: flex;
       align-items: flex-start;
       justify-content: space-between;
       gap: 24px;
       margin-bottom: 28px;
+      padding-bottom: 25px;
+    }
+
+    .app-header::after {
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      height: 1px;
+      background: linear-gradient(90deg, var(--text) 0 86px, var(--line) 86px 100%);
+      content: "";
     }
 
     .eyebrow {
+      display: flex;
+      align-items: center;
+      gap: 10px;
       margin: 0 0 6px;
       color: var(--muted);
       font-size: 0.78rem;
       font-weight: 700;
       letter-spacing: 0.16em;
       text-transform: uppercase;
+    }
+
+    .eyebrow::before {
+      width: 26px;
+      height: 1px;
+      background: currentColor;
+      content: "";
     }
 
     h1 {
@@ -132,6 +162,7 @@
     }
 
     .column {
+      position: relative;
       min-height: 420px;
       padding: 16px;
       border: 1px solid var(--line);
@@ -139,6 +170,17 @@
       background: var(--surface-soft);
       box-shadow: var(--shadow);
       transition: border-color 150ms ease, background-color 180ms ease, transform 150ms ease;
+    }
+
+    .column::before {
+      position: absolute;
+      top: -1px;
+      left: 17px;
+      width: 54px;
+      height: 1px;
+      background: var(--text);
+      content: "";
+      opacity: 0.82;
     }
 
     .column.is-over {
@@ -198,6 +240,17 @@
       background: var(--surface);
       box-shadow: var(--card-shadow);
       transition: border-color 150ms ease, opacity 150ms ease, transform 150ms ease, background-color 180ms ease;
+    }
+
+    .task-card::before {
+      position: absolute;
+      top: 15px;
+      bottom: 15px;
+      left: -1px;
+      width: 1px;
+      background: var(--line-strong);
+      content: "";
+      opacity: 0.7;
     }
 
     .task-card[draggable="true"] { cursor: grab; }
@@ -366,6 +419,14 @@
     }
 
     @media (max-width: 700px) {
+      body {
+        background-image: repeating-radial-gradient(
+          ellipse 420px 260px at 112% -4%,
+          transparent 0 30px,
+          var(--ornament-line) 31px 32px,
+          transparent 33px 57px
+        );
+      }
       .app-shell { padding: 22px 14px 34px; }
       .app-header { margin-bottom: 20px; }
       .header-note { max-width: 250px; }
