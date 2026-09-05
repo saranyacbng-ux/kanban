@@ -1,0 +1,701 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="กระดานติดตามออเดอร์น้ำหวาน ใช้งานได้ทันทีและเก็บข้อมูลไว้ในเครื่อง">
+  <title>กระดานออเดอร์น้ำหวาน</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f4f4f2;
+      --surface: #ffffff;
+      --surface-soft: #fafafa;
+      --text: #171717;
+      --muted: #686868;
+      --line: #dededb;
+      --line-strong: #b8b8b3;
+      --primary: #111111;
+      --primary-text: #ffffff;
+      --danger: #9d2929;
+      --shadow: 0 14px 36px rgba(0, 0, 0, 0.06);
+      --card-shadow: 0 5px 16px rgba(0, 0, 0, 0.055);
+      --radius: 18px;
+    }
+
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --bg: #111111;
+      --surface: #1b1b1b;
+      --surface-soft: #202020;
+      --text: #f2f2ef;
+      --muted: #aaaaa4;
+      --line: #353535;
+      --line-strong: #525252;
+      --primary: #f1f1ed;
+      --primary-text: #151515;
+      --danger: #ff8b8b;
+      --shadow: 0 16px 42px rgba(0, 0, 0, 0.28);
+      --card-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+    }
+
+    * { box-sizing: border-box; }
+
+    html { min-height: 100%; }
+
+    body {
+      min-width: 320px;
+      min-height: 100vh;
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 16px;
+      line-height: 1.5;
+      transition: background-color 180ms ease, color 180ms ease;
+    }
+
+    button, textarea { font: inherit; }
+
+    button {
+      color: inherit;
+      cursor: pointer;
+    }
+
+    button:focus-visible,
+    textarea:focus-visible {
+      outline: 3px solid color-mix(in srgb, var(--text) 28%, transparent);
+      outline-offset: 2px;
+    }
+
+    .app-shell {
+      width: min(1600px, 100%);
+      margin: 0 auto;
+      padding: 34px clamp(18px, 3vw, 48px) 48px;
+    }
+
+    .app-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 24px;
+      margin-bottom: 28px;
+    }
+
+    .eyebrow {
+      margin: 0 0 6px;
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(1.8rem, 4vw, 3.25rem);
+      font-weight: 680;
+      letter-spacing: -0.045em;
+      line-height: 1.08;
+    }
+
+    .header-note {
+      margin: 10px 0 0;
+      color: var(--muted);
+      font-size: 0.94rem;
+    }
+
+    .theme-toggle {
+      display: inline-flex;
+      min-width: 48px;
+      min-height: 48px;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--surface);
+      box-shadow: var(--card-shadow);
+      font-size: 1.15rem;
+      transition: transform 150ms ease, border-color 150ms ease, background-color 180ms ease;
+    }
+
+    .theme-toggle:hover {
+      border-color: var(--line-strong);
+      transform: translateY(-1px);
+    }
+
+    .board {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(245px, 1fr));
+      gap: 16px;
+      align-items: start;
+    }
+
+    .column {
+      min-height: 420px;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface-soft);
+      box-shadow: var(--shadow);
+      transition: border-color 150ms ease, background-color 180ms ease, transform 150ms ease;
+    }
+
+    .column.is-over {
+      border-color: var(--text);
+      transform: translateY(-2px);
+    }
+
+    .column-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 2px 2px 15px;
+    }
+
+    .column-title {
+      margin: 0;
+      font-size: 1rem;
+      font-weight: 680;
+      letter-spacing: -0.015em;
+    }
+
+    .count {
+      display: inline-flex;
+      min-width: 30px;
+      height: 30px;
+      align-items: center;
+      justify-content: center;
+      padding: 0 9px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--surface);
+      color: var(--muted);
+      font-size: 0.82rem;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .card-list {
+      display: grid;
+      min-height: 100px;
+      gap: 10px;
+      align-content: start;
+    }
+
+    .empty-state {
+      margin: 18px 6px;
+      color: var(--muted);
+      font-size: 0.9rem;
+      text-align: center;
+    }
+
+    .task-card {
+      position: relative;
+      padding: 15px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: var(--surface);
+      box-shadow: var(--card-shadow);
+      transition: border-color 150ms ease, opacity 150ms ease, transform 150ms ease, background-color 180ms ease;
+    }
+
+    .task-card[draggable="true"] { cursor: grab; }
+    .task-card[draggable="true"]:active { cursor: grabbing; }
+
+    .task-card:hover { border-color: var(--line-strong); }
+
+    .task-card.is-dragging {
+      opacity: 0.45;
+      transform: rotate(1deg);
+    }
+
+    .card-text {
+      margin: 0;
+      overflow-wrap: anywhere;
+      white-space: pre-wrap;
+    }
+
+    .card-actions {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 6px;
+      margin-top: 14px;
+      padding-top: 11px;
+      border-top: 1px solid var(--line);
+    }
+
+    .action-button {
+      min-height: 38px;
+      padding: 7px 10px;
+      border: 0;
+      border-radius: 9px;
+      background: transparent;
+      color: var(--muted);
+      font-size: 0.84rem;
+      font-weight: 620;
+    }
+
+    .action-button:hover {
+      background: var(--surface-soft);
+      color: var(--text);
+    }
+
+    .action-button.delete:hover { color: var(--danger); }
+
+    .move-controls {
+      display: none;
+      margin-right: auto;
+      gap: 8px;
+    }
+
+    .move-button {
+      display: inline-flex;
+      min-width: 48px;
+      min-height: 48px;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--surface-soft);
+      font-size: 1.25rem;
+    }
+
+    .move-button:disabled {
+      cursor: not-allowed;
+      opacity: 0.28;
+    }
+
+    .add-card-button {
+      width: 100%;
+      min-height: 46px;
+      margin-top: 12px;
+      border: 1px dashed var(--line-strong);
+      border-radius: 11px;
+      background: transparent;
+      color: var(--muted);
+      font-weight: 650;
+      transition: background-color 150ms ease, color 150ms ease, border-color 150ms ease;
+    }
+
+    .add-card-button:hover {
+      border-color: var(--text);
+      background: var(--surface);
+      color: var(--text);
+    }
+
+    dialog {
+      width: min(520px, calc(100vw - 32px));
+      padding: 0;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: var(--surface);
+      color: var(--text);
+      box-shadow: 0 24px 80px rgba(0, 0, 0, 0.24);
+    }
+
+    dialog::backdrop {
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(3px);
+    }
+
+    .dialog-form { padding: 24px; }
+
+    .dialog-form h2 {
+      margin: 0 0 6px;
+      font-size: 1.35rem;
+      letter-spacing: -0.025em;
+    }
+
+    .dialog-hint {
+      margin: 0 0 18px;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 130px;
+      resize: vertical;
+      padding: 13px 14px;
+      border: 1px solid var(--line-strong);
+      border-radius: 11px;
+      background: var(--surface-soft);
+      color: var(--text);
+      line-height: 1.55;
+    }
+
+    .dialog-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .dialog-button {
+      min-height: 44px;
+      padding: 9px 16px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--surface);
+      font-weight: 650;
+    }
+
+    .dialog-button.primary {
+      border-color: var(--primary);
+      background: var(--primary);
+      color: var(--primary-text);
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    @media (max-width: 1050px) {
+      .board { grid-template-columns: repeat(2, minmax(260px, 1fr)); }
+    }
+
+    @media (max-width: 700px) {
+      .app-shell { padding: 22px 14px 34px; }
+      .app-header { margin-bottom: 20px; }
+      .header-note { max-width: 250px; }
+      .board { grid-template-columns: 1fr; }
+      .column { min-height: 260px; padding: 14px; }
+      .move-controls { display: flex; }
+      .card-actions { align-items: center; }
+      .action-button { min-height: 44px; }
+      .task-card[draggable="true"] { cursor: default; }
+      .dialog-form { padding: 20px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="app-shell">
+    <header class="app-header">
+      <div>
+        <p class="eyebrow">ORDER FLOW</p>
+        <h1>กระดานออเดอร์น้ำหวาน</h1>
+        <p class="header-note">ลากการ์ดเพื่ออัปเดตสถานะ หรือใช้ปุ่มลูกศรบนมือถือ</p>
+      </div>
+      <button class="theme-toggle" id="theme-toggle" type="button" aria-label="เปลี่ยนเป็นโหมดมืด" title="สลับโหมดสี">
+        <span aria-hidden="true" id="theme-icon">●</span>
+      </button>
+    </header>
+
+    <section class="board" id="board" aria-label="กระดานติดตามออเดอร์"></section>
+  </main>
+
+  <dialog id="card-dialog" aria-labelledby="dialog-title">
+    <form class="dialog-form" id="card-form" method="dialog">
+      <h2 id="dialog-title">เพิ่มออเดอร์</h2>
+      <p class="dialog-hint" id="dialog-hint"></p>
+      <label class="sr-only" for="card-text">รายละเอียดออเดอร์</label>
+      <textarea id="card-text" maxlength="500" placeholder="เช่น ชาไทยหวานน้อย 2 แก้ว — คุณแอน" required></textarea>
+      <div class="dialog-actions">
+        <button class="dialog-button" id="cancel-dialog" type="button">ยกเลิก</button>
+        <button class="dialog-button primary" type="submit">บันทึก</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script>
+    (() => {
+      'use strict';
+
+      const STORAGE_KEY = 'namwan-kanban-v1';
+      const THEME_KEY = 'namwan-kanban-theme';
+
+      // แก้ชื่อคอลัมน์ของบอร์ดได้ตรงนี้เลย โดยคงค่า id เดิมไว้เพื่อรักษาข้อมูลเก่า
+      const COLUMNS = [
+        { id: 'incoming', name: 'รับออเดอร์' },
+        { id: 'making', name: 'กำลังชง' },
+        { id: 'ready', name: 'พร้อมส่งมอบ' },
+        { id: 'complete', name: 'ส่งมอบแล้ว' }
+      ];
+
+      const board = document.getElementById('board');
+      const dialog = document.getElementById('card-dialog');
+      const form = document.getElementById('card-form');
+      const textInput = document.getElementById('card-text');
+      const dialogTitle = document.getElementById('dialog-title');
+      const dialogHint = document.getElementById('dialog-hint');
+      const cancelDialogButton = document.getElementById('cancel-dialog');
+      const themeToggle = document.getElementById('theme-toggle');
+      const themeIcon = document.getElementById('theme-icon');
+
+      let cards = loadCards();
+      let dialogState = null;
+      let draggedCardId = null;
+
+      function loadCards() {
+        try {
+          const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+          if (!Array.isArray(saved)) return [];
+          return saved.filter(card =>
+            card &&
+            typeof card.id === 'string' &&
+            typeof card.text === 'string' &&
+            COLUMNS.some(column => column.id === card.columnId)
+          );
+        } catch (error) {
+          console.warn('ไม่สามารถอ่านข้อมูลเดิมได้', error);
+          return [];
+        }
+      }
+
+      function saveCards() {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(cards));
+      }
+
+      function makeId() {
+        if (globalThis.crypto && typeof globalThis.crypto.randomUUID === 'function') {
+          return crypto.randomUUID();
+        }
+        return `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+      }
+
+      function render() {
+        board.replaceChildren(...COLUMNS.map(createColumn));
+      }
+
+      function createColumn(column, columnIndex) {
+        const section = document.createElement('section');
+        section.className = 'column';
+        section.dataset.columnId = column.id;
+        section.setAttribute('aria-labelledby', `column-${column.id}`);
+
+        const columnCards = cards.filter(card => card.columnId === column.id);
+
+        const header = document.createElement('header');
+        header.className = 'column-header';
+
+        const title = document.createElement('h2');
+        title.className = 'column-title';
+        title.id = `column-${column.id}`;
+        title.textContent = column.name;
+
+        const count = document.createElement('span');
+        count.className = 'count';
+        count.textContent = String(columnCards.length);
+        count.setAttribute('aria-label', `${columnCards.length} ออเดอร์`);
+
+        header.append(title, count);
+
+        const list = document.createElement('div');
+        list.className = 'card-list';
+        list.dataset.columnId = column.id;
+
+        if (columnCards.length === 0) {
+          const empty = document.createElement('p');
+          empty.className = 'empty-state';
+          empty.textContent = 'ยังไม่มีออเดอร์ในขั้นตอนนี้';
+          list.append(empty);
+        } else {
+          columnCards.forEach(card => list.append(createCard(card, columnIndex)));
+        }
+
+        section.addEventListener('dragover', event => {
+          event.preventDefault();
+          if (draggedCardId) section.classList.add('is-over');
+        });
+
+        section.addEventListener('dragleave', event => {
+          if (!section.contains(event.relatedTarget)) section.classList.remove('is-over');
+        });
+
+        section.addEventListener('drop', event => {
+          event.preventDefault();
+          section.classList.remove('is-over');
+          if (draggedCardId) moveCardToColumn(draggedCardId, column.id);
+        });
+
+        const addButton = document.createElement('button');
+        addButton.className = 'add-card-button';
+        addButton.type = 'button';
+        addButton.textContent = '+ เพิ่มออเดอร์';
+        addButton.addEventListener('click', () => openAddDialog(column.id));
+
+        section.append(header, list, addButton);
+        return section;
+      }
+
+      function createCard(card, columnIndex) {
+        const article = document.createElement('article');
+        article.className = 'task-card';
+        article.draggable = true;
+        article.dataset.cardId = card.id;
+
+        article.addEventListener('dragstart', event => {
+          draggedCardId = card.id;
+          article.classList.add('is-dragging');
+          event.dataTransfer.effectAllowed = 'move';
+          event.dataTransfer.setData('text/plain', card.id);
+        });
+
+        article.addEventListener('dragend', () => {
+          draggedCardId = null;
+          article.classList.remove('is-dragging');
+          document.querySelectorAll('.column.is-over').forEach(item => item.classList.remove('is-over'));
+        });
+
+        const text = document.createElement('p');
+        text.className = 'card-text';
+        text.textContent = card.text;
+
+        const actions = document.createElement('div');
+        actions.className = 'card-actions';
+
+        const moveControls = document.createElement('div');
+        moveControls.className = 'move-controls';
+
+        const moveLeft = createMoveButton('←', 'ย้ายไปขั้นตอนก่อนหน้า', columnIndex === 0, () => {
+          moveCardToColumn(card.id, COLUMNS[columnIndex - 1].id);
+        });
+
+        const moveRight = createMoveButton('→', 'ย้ายไปขั้นตอนถัดไป', columnIndex === COLUMNS.length - 1, () => {
+          moveCardToColumn(card.id, COLUMNS[columnIndex + 1].id);
+        });
+
+        moveControls.append(moveLeft, moveRight);
+
+        const editButton = document.createElement('button');
+        editButton.className = 'action-button';
+        editButton.type = 'button';
+        editButton.textContent = 'แก้ไข';
+        editButton.addEventListener('click', () => openEditDialog(card.id));
+
+        const deleteButton = document.createElement('button');
+        deleteButton.className = 'action-button delete';
+        deleteButton.type = 'button';
+        deleteButton.textContent = 'ลบ';
+        deleteButton.addEventListener('click', () => deleteCard(card.id));
+
+        actions.append(moveControls, editButton, deleteButton);
+        article.append(text, actions);
+        return article;
+      }
+
+      function createMoveButton(symbol, label, disabled, onClick) {
+        const button = document.createElement('button');
+        button.className = 'move-button';
+        button.type = 'button';
+        button.textContent = symbol;
+        button.disabled = disabled;
+        button.setAttribute('aria-label', label);
+        button.addEventListener('click', onClick);
+        return button;
+      }
+
+      function openAddDialog(columnId) {
+        const column = COLUMNS.find(item => item.id === columnId);
+        dialogState = { mode: 'add', columnId };
+        dialogTitle.textContent = 'เพิ่มออเดอร์';
+        dialogHint.textContent = `เพิ่มเข้า “${column.name}”`;
+        textInput.value = '';
+        dialog.showModal();
+        requestAnimationFrame(() => textInput.focus());
+      }
+
+      function openEditDialog(cardId) {
+        const card = cards.find(item => item.id === cardId);
+        if (!card) return;
+        dialogState = { mode: 'edit', cardId };
+        dialogTitle.textContent = 'แก้รายละเอียดออเดอร์';
+        dialogHint.textContent = 'แก้แล้วกดบันทึก ข้อมูลจะจำไว้ในเครื่องนี้';
+        textInput.value = card.text;
+        dialog.showModal();
+        requestAnimationFrame(() => {
+          textInput.focus();
+          textInput.setSelectionRange(textInput.value.length, textInput.value.length);
+        });
+      }
+
+      function deleteCard(cardId) {
+        const card = cards.find(item => item.id === cardId);
+        if (!card) return;
+        if (!confirm(`ลบออเดอร์นี้ใช่ไหม?\n\n${card.text}\n\nเมื่อลบแล้วจะกู้คืนไม่ได้`)) return;
+        cards = cards.filter(item => item.id !== cardId);
+        saveCards();
+        render();
+      }
+
+      function moveCardToColumn(cardId, columnId) {
+        const card = cards.find(item => item.id === cardId);
+        if (!card || card.columnId === columnId) return;
+        card.columnId = columnId;
+        saveCards();
+        render();
+      }
+
+      form.addEventListener('submit', event => {
+        event.preventDefault();
+        const value = textInput.value.trim();
+        if (!value || !dialogState) {
+          textInput.focus();
+          return;
+        }
+
+        if (dialogState.mode === 'add') {
+          cards.push({ id: makeId(), text: value, columnId: dialogState.columnId });
+        } else {
+          const card = cards.find(item => item.id === dialogState.cardId);
+          if (card) card.text = value;
+        }
+
+        saveCards();
+        dialog.close();
+        dialogState = null;
+        render();
+      });
+
+      cancelDialogButton.addEventListener('click', () => {
+        dialog.close();
+        dialogState = null;
+      });
+
+      dialog.addEventListener('cancel', () => {
+        dialogState = null;
+      });
+
+      function getInitialTheme() {
+        const savedTheme = localStorage.getItem(THEME_KEY);
+        if (savedTheme === 'light' || savedTheme === 'dark') return savedTheme;
+        return matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      }
+
+      function applyTheme(theme) {
+        document.documentElement.dataset.theme = theme;
+        const isDark = theme === 'dark';
+        themeIcon.textContent = isDark ? '○' : '●';
+        themeToggle.setAttribute('aria-label', isDark ? 'เปลี่ยนเป็นโหมดสว่าง' : 'เปลี่ยนเป็นโหมดมืด');
+      }
+
+      themeToggle.addEventListener('click', () => {
+        const nextTheme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+        localStorage.setItem(THEME_KEY, nextTheme);
+        applyTheme(nextTheme);
+      });
+
+      applyTheme(getInitialTheme());
+      render();
+    })();
+  </script>
+</body>
+</html>
